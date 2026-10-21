@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tool request</title>
+  <style>
+    body { font-family: sans-serif; margin: 1.2rem; font-size: 1.3rem; }
+    #message { min-height: 1.5em; font-weight: 700; }
+    textarea, button { font: inherit; width: 100%; box-sizing: border-box; }
+    textarea { min-height: 8rem; margin-top: 0.4rem; }
+    button { margin-top: 0.7rem; padding: 0.9rem; }
+  </style>
+</head>
+<body>
+  <p id="message"></p>
+  <label for="need">What does the carpenter need?</label>
+  <textarea id="need"></textarea>
+  <button type="button" id="request">Request</button>
+  <button type="button" id="clear">Clear</button>
+  <script>
+    let requestText = "";
+    const need = document.querySelector("#need");
+    const message = document.querySelector("#message");
+
+    document.querySelector("#request").onclick = () => {
+      requestText = need.value.trim();
+      message.textContent = requestText ? "Request submitted for '"+ requestText + "'" : "";
+    };
+
+    document.querySelector("#clear").onclick = () => {
+      requestText = "";
+      need.value = "";
+      message.textContent = "";
+    };
+  </script>
+</body>
+</html>
