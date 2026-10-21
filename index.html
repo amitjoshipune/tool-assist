@@ -19,6 +19,8 @@
   <button type="button" id="request">Request</button>
   <button type="button" id="clear">Clear</button>
   <script>
+    const whatsappPhone = "9890490086";
+    
     let requestText = "";
     const need = document.querySelector("#need");
     const message = document.querySelector("#message");
@@ -26,6 +28,12 @@
     document.querySelector("#request").onclick = () => {
       requestText = need.value.trim();
       message.textContent = requestText ? "Request submitted for '"+ requestText + "'" : "";
+        if (requestText) {
+            const url = "https://wa.me/" + whatsappPhone + "?text=" + encodeURIComponent("Tools site request:" + requestText);
+            window.open(url, "_blank");
+        }else{
+            message.textContent = "Please enter a request before submitting.";
+        }
     };
 
     document.querySelector("#clear").onclick = () => {
