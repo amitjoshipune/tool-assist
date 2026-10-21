@@ -147,3 +147,33 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# secrets and signing
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+local.properties
+google-services.json
+
+# angular / capacitor
+.angular/
+www/
+
+# android build output
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+
+# .net
+bin/
+obj/
+
+# editors
+.vs/
+.idea/
+*.user
+Thumbs.db
