@@ -5,42 +5,154 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tool request</title>
   <style>
-    body { font-family: sans-serif; margin: 1.2rem; font-size: 1.3rem; }
-    #message { min-height: 1.5em; font-weight: 700; }
-    textarea, button { font: inherit; width: 100%; box-sizing: border-box; }
-    textarea { min-height: 8rem; margin-top: 0.4rem; }
-    button { margin-top: 0.7rem; padding: 0.9rem; }
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: sans-serif; font-size: 1.2rem; line-height: 1.35; background: #f4f1ea; color: #1c1915; }
+    main { max-width: 34rem; margin: 0 auto; padding: 1rem 1rem 2rem; }
+    h1 { font-size: 1.7rem; line-height: 1.15; margin: 0 0 0.3rem; }
+    .lead { margin: 0 0 1rem; color: #3f3932; }
+    #message { min-height: 1.4em; font-weight: 700; margin: 0 0 0.8rem; }
+    label { display: block; font-weight: 700; margin: 0.9rem 0 0.3rem; }
+    label small { display: block; font-weight: 400; color: #3f3932; }
+    input, select, textarea, button { font: inherit; width: 100%; }
+    input, select, textarea { padding: 0.7rem; border: 1px solid #1c1915; border-radius: 0.4rem; background: #fff; }
+    textarea { min-height: 5.5rem; }
+    button { margin-top: 0.7rem; padding: 0.9rem; border-radius: 0.4rem; border: 1px solid #1c1915; }
+    button.primary { background: #1d3c34; color: #f4f1ea; font-weight: 700; }
+    button.secondary { background: #fff; }
+    .hidden { display: none; }
+    .note { font-size: 1rem; color: #3f3932; margin: 0.3rem 0 0; }
   </style>
 </head>
 <body>
-  <p id="message"></p>
-  <label for="need">What does the carpenter need?</label>
-  <textarea id="need"></textarea>
-  <button type="button" id="request">Request</button>
-  <button type="button" id="clear">Clear</button>
+  <main>
+    <h1>Tool request</h1>
+    <p class="lead">Spare, fitting, or a machine that has stopped. This page does not store the request. It opens WhatsApp.</p>
+    <p id="message" role="status"></p>
+    <form id="request-form">
+      <label for="person">Your name <small>तुमचे नाव</small></label>
+      <input id="person" name="person" autocomplete="name" required>
+      <label for="mobile">Mobile <small>मोबाइल</small></label>
+      <input id="mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 digit mobile" required>
+      <label for="site">Site address <small>wing, flat, building</small></label>
+      <textarea id="site" name="site" required placeholder="B wing, 704, society or road"></textarea>
+      <label for="kind">What help <small>काय हवे</small></label>
+      <select id="kind" name="kind" required>
+        <option value="">Choose</option>
+        <option value="spare">Spare part</option>
+        <option value="accessory">Accessory</option>
+        <option value="ancillary">Ancillary fitting</option>
+        <option value="breakdown">Machine stopped, needs repair</option>
+        <option value="quick">Quick fix</option>
+        <option value="other">Other, this time only</option>
+      </select>
+      <div id="item-block">
+        <label for="item">Common item <small>यादीतून निवडा</small></label>
+        <select id="item" name="item"></select>
+      </div>
+      <div id="other-block" class="hidden">
+        <label for="other">Name it once <small>पुढच्या वेळी यादीत येणार नाही</small></label>
+        <input id="other" name="other" placeholder="What is needed this once">
+      </div>
+      <label for="qty">Quantity <small>किती, if it matters</small></label>
+      <input id="qty" name="qty" inputmode="numeric" placeholder="Optional">
+      <label for="spec">Specification <small>size, brand, model</small></label>
+      <input id="spec" name="spec" placeholder="Optional. Example: 6mm, Bosch">
+      <label for="comment">Comment <small>विशेष सूचना</small></label>
+      <textarea id="comment" name="comment" placeholder="Optional"></textarea>
+      <label for="photos">Photographs <small>up to 3, if the name is missing or unreadable</small></label>
+      <input id="photos" name="photos" type="file" accept="image/*" capture="environment" multiple>
+      <p class="note">Photos stay on this phone. If WhatsApp does not take them with the text, attach them in the chat before you press send.</p>
+      <button class="primary" type="submit">Send on WhatsApp</button>
+      <button class="secondary" type="button" id="clear">Clear</button>
+    </form>
+  </main>
   <script>
     const whatsappPhone = "9890490086";
-    
-    let requestText = "";
-    const need = document.querySelector("#need");
+    const items = {
+      spare: ["Carbon brush", "Switch", "Drill chuck", "Power cord", "Bearing", "Saw blade", "Drill bit", "Router bit", "Grinder disc"],
+      accessory: ["Screwdriver bits", "Clamp", "Sandpaper", "Measuring tape"],
+      ancillary: ["Screws", "Nails", "Hinges", "Drawer channel", "Lock", "Glue", "Edge band"],
+      breakdown: ["Drill machine", "Angle grinder", "Jigsaw", "Circular saw", "Router", "Planer"],
+      quick: ["Drill machine", "Angle grinder", "Jigsaw", "Circular saw", "Router", "Planer", "Small repair on site"]
+    };
+    const kindNames = {
+      spare: "Spare part", accessory: "Accessory", ancillary: "Ancillary fitting",
+      breakdown: "Machine stopped, needs repair", quick: "Quick fix", other: "Other"
+    };
+    const form = document.querySelector("#request-form");
     const message = document.querySelector("#message");
-
-    document.querySelector("#request").onclick = () => {
-      requestText = need.value.trim();
-      message.textContent = requestText ? "Request submitted for '"+ requestText + "'" : "";
-        if (requestText) {
-            const url = "https://wa.me/" + whatsappPhone + "?text=" + encodeURIComponent("Tools site request:" + requestText);
-            window.open(url, "_blank");
-        }else{
-            message.textContent = "Please enter a request before submitting.";
+    const kind = document.querySelector("#kind");
+    const item = document.querySelector("#item");
+    const itemBlock = document.querySelector("#item-block");
+    const otherBlock = document.querySelector("#other-block");
+    const otherInput = document.querySelector("#other");
+    const photos = document.querySelector("#photos");
+    function fillItems() {
+      const list = items[kind.value] || [];
+      item.replaceChildren();
+      const first = document.createElement("option");
+      first.value = "";
+      first.textContent = list.length ? "Choose" : "";
+      item.append(first);
+      list.forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        item.append(option);
+      });
+      const isOther = kind.value === "other";
+      itemBlock.classList.toggle("hidden", isOther || !kind.value);
+      otherBlock.classList.toggle("hidden", !isOther);
+      if (!isOther) otherInput.value = "";
+    }
+    kind.addEventListener("change", fillItems);
+    fillItems();
+    function value(id) { return document.querySelector("#" + id).value.trim(); }
+    function buildText() {
+      const chosen = kind.value === "other" ? value("other") : item.value;
+      const lines = ["Tool request", "Name: " + value("person"), "Mobile: " + value("mobile"), "Site: " + value("site"), "Help: " + (kindNames[kind.value] || ""), "Item: " + chosen];
+      if (value("qty")) lines.push("Quantity: " + value("qty"));
+      if (value("spec")) lines.push("Specification: " + value("spec"));
+      if (value("comment")) lines.push("Comment: " + value("comment"));
+      const count = Math.min(photos.files.length, 3);
+      if (count) lines.push("Photos: " + count + " attached from the phone, or attach them in this chat.");
+      return lines.join("\n");
+    }
+    function missingFields() {
+      const missing = [];
+      if (!value("person")) missing.push("name");
+      if (!value("mobile")) missing.push("mobile");
+      if (!value("site")) missing.push("site address");
+      if (!kind.value) missing.push("what help");
+      if (kind.value === "other" && !value("other")) missing.push("the one-time name");
+      if (kind.value && kind.value !== "other" && !item.value) missing.push("an item");
+      return missing;
+    }
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const missing = missingFields();
+      if (missing.length) { message.textContent = "Add " + missing.join(", ") + "."; return; }
+      const text = buildText();
+      const files = [...photos.files].slice(0, 3);
+      if (files.length && navigator.canShare && navigator.canShare({ files })) {
+        try {
+          await navigator.share({ text, files });
+          message.textContent = "WhatsApp opened. Press send there.";
+          return;
+        } catch (error) {
+          if (error && error.name === "AbortError") { message.textContent = "Send cancelled. The form is still here."; return; }
         }
-    };
-
-    document.querySelector("#clear").onclick = () => {
-      requestText = "";
-      need.value = "";
+      }
+      window.open("https://wa.me/" + whatsappPhone + "?text=" + encodeURIComponent(text), "_blank");
+      message.textContent = files.length ? "WhatsApp opened. Attach the photos in the chat, then send." : "WhatsApp opened. Press send there.";
+    });
+    document.querySelector("#clear").addEventListener("click", () => {
+      form.reset();
+      photos.value = "";
       message.textContent = "";
-    };
+      fillItems();
+    });
   </script>
 </body>
 </html>

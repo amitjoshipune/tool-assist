@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tool Assist</string>
+    <string name="title_activity_main">Tool Assist</string>
+    <string name="package_name">in.aitoall.toolassist</string>
+    <string name="custom_url_scheme">in.aitoall.toolassist</string>
+</resources>
