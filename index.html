@@ -60,9 +60,9 @@
       <input id="spec" name="spec" placeholder="Optional. Example: 6mm, Bosch">
       <label for="comment">Comment <small>विशेष सूचना</small></label>
       <textarea id="comment" name="comment" placeholder="Optional"></textarea>
-      <label for="photos">Photographs <small>up to 3, if the name is missing or unreadable</small></label>
+      <!-- <label for="photos">Photographs <small>up to 3, if the name is missing or unreadable</small></label>
       <input id="photos" name="photos" type="file" accept="image/*" capture="environment" multiple>
-      <p class="note">Photos stay on this phone. If WhatsApp does not take them with the text, attach them in the chat before you press send.</p>
+      <p class="note">Photos stay on this phone. If WhatsApp does not take them with the text, attach them in the chat before you press send.</p> -->
       <button class="primary" type="submit">Send on WhatsApp</button>
       <button class="secondary" type="button" id="clear">Clear</button>
     </form>
@@ -87,7 +87,7 @@
     const itemBlock = document.querySelector("#item-block");
     const otherBlock = document.querySelector("#other-block");
     const otherInput = document.querySelector("#other");
-    const photos = document.querySelector("#photos");
+    //const photos = document.querySelector("#photos");
     function fillItems() {
       const list = items[kind.value] || [];
       item.replaceChildren();
@@ -115,8 +115,8 @@
       if (value("qty")) lines.push("Quantity: " + value("qty"));
       if (value("spec")) lines.push("Specification: " + value("spec"));
       if (value("comment")) lines.push("Comment: " + value("comment"));
-      const count = Math.min(photos.files.length, 3);
-      if (count) lines.push("Photos: " + count + " attached from the phone, or attach them in this chat.");
+      //const count = Math.min(photos.files.length, 3);
+      //if (count) lines.push("Photos: " + count + " attached from the phone, or attach them in this chat.");
       return lines.join("\n");
     }
     function missingFields() {
@@ -134,7 +134,8 @@
       const missing = missingFields();
       if (missing.length) { message.textContent = "Add " + missing.join(", ") + "."; return; }
       const text = buildText();
-      const files = [...photos.files].slice(0, 3);
+      //const files = [...photos.files].slice(0, 3);
+      /*
       if (files.length && navigator.canShare && navigator.canShare({ files })) {
         try {
           await navigator.share({ text, files });
@@ -144,12 +145,13 @@
           if (error && error.name === "AbortError") { message.textContent = "Send cancelled. The form is still here."; return; }
         }
       }
+      */
       window.open("https://wa.me/" + whatsappPhone + "?text=" + encodeURIComponent(text), "_blank");
-      message.textContent = files.length ? "WhatsApp opened. Attach the photos in the chat, then send." : "WhatsApp opened. Press send there.";
+      //message.textContent = files.length ? "WhatsApp opened. Attach the photos in the chat, then send." : "WhatsApp opened. Press send there.";
     });
     document.querySelector("#clear").addEventListener("click", () => {
       form.reset();
-      photos.value = "";
+      //photos.value = "";
       message.textContent = "";
       fillItems();
     });
